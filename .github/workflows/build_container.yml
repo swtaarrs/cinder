@@ -1,17 +1,12 @@
 name: Create and publish a Docker image
 
-on: [push]
-    # branches:
-    # - "cinder/3.8"
-    # # TODO(emacs): Remove
-    # - mb-continuous-deploy
-  # - "cinder/3.10"
-
-# TODO(emacs): Remove on pull_request
 on:
-  pull_request:
+  push:
     branches:
     - "cinder/3.8"
+    - "cinder/3.10"
+    # TODO(emacs): Remove
+    - mb-continuous-deploy
 
 env:
   REGISTRY: ghcr.io
