@@ -1,5 +1,10 @@
-# Build environment
-FROM ghcr.io/facebookincubator/cinder/python-build-env:latest as build
+FROM fedora:32 as build-container
+LABEL org.opencontainers.image.source https://github.com/facebookincubator/cinder
+RUN dnf install -y g++ git zlib-devel bzip2 bzip2-devel readline-devel sqlite \
+                   sqlite-devel openssl-devel xz xz-devel libffi-devel
+
+# Build container
+FROM build-container as build
 COPY --chmod=r . /cinder-build
 WORKDIR /cinder-build/build
 RUN ../configure --prefix=/cinder
