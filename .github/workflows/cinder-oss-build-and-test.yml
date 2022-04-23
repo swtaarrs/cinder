@@ -37,7 +37,7 @@ jobs:
           target: build
           file: .github/workflows/cinder/Dockerfile
       - name: Run Cinder Tests
-        run: docker run --rm -w /cinder ${{ steps.meta.outputs.tags }} ./oss-cinder-test.sh
+        run: docker run --rm -w /cinder-build ${{ steps.meta.outputs.tags }} ./oss-cinder-test.sh
       - name: Extract metadata for tested Cinder Docker image push
         id: metapush
         uses: docker/metadata-action@v3
