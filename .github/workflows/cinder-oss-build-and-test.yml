@@ -5,7 +5,6 @@ on: [push]
 env:
   REGISTRY: ghcr.io
   CINDER_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/cinder
-  CINDER_EXPLORER_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/cinder-explorer
 
 jobs:
   cinder-oss-build-and-test-job:
@@ -33,6 +32,7 @@ jobs:
           context: .
           tags: ${{ steps.meta.outputs.tags }}
           push: true
+          target: build
           file: .github/workflows/cinder/Dockerfile
       - name: Run Cinder Tests
         run: docker run --rm -w /cinder ${{ steps.meta.outputs.tags }} ./oss-cinder-test.sh
@@ -54,6 +54,7 @@ jobs:
           push: true
           tags: ${{ steps.metapush.outputs.tags }}
           labels: ${{ steps.metapush.outputs.labels }}
+          target: runtime
           file: .github/workflows/cinder/Dockerfile
 
   cinder-explorer-app-job:
@@ -73,7 +74,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.CINDER_EXPLORER_IMAGE_NAME }}
+          images: ${{ env.CINDER_IMAGE_NAME }}
           tags: |
             type=sha,prefix={{branch}}.
             type=ref,event=branch
@@ -85,4 +86,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          file: .github/workflows/cinder-explorer/Dockerfile
+          target: explorer
+          file: .github/workflows/cinder/Dockerfile
