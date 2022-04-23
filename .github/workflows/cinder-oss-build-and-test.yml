@@ -4,7 +4,9 @@ on: [push]
 
 env:
   REGISTRY: ghcr.io
-  CINDER_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/cinder
+  CINDER_BUILD_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/cinder-build
+  CINDER_RUNTIME_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/cinder-runtime
+  CINDER_EXPLORER_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/cinder-explorer
 
 jobs:
   cinder-oss-build-and-test-job:
@@ -22,7 +24,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.CINDER_IMAGE_NAME }}
+          images: ${{ env.CINDER_BUILD_IMAGE_NAME }}
           # we publish the [untested] image using the branch + sha (e.g. "cinder-3.8.162db45") for debuggability
           # note: `/` in the branch name (e.g "cinder/3.8") are auto-converted to `-` by this action
           tags: type=sha,prefix={{branch}}.
@@ -40,7 +42,7 @@ jobs:
         id: metapush
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.CINDER_IMAGE_NAME }}
+          images: ${{ env.CINDER_RUNTIME_IMAGE_NAME }}
           # once the image passes tests, we also publish it using the branch name (e.g. "cinder-3.8")
           # if this is the default branch, we also publish the image as "latest"
           tags: |
@@ -74,7 +76,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.CINDER_IMAGE_NAME }}
+          images: ${{ env.CINDER_EXPLORER_IMAGE_NAME }}
           tags: |
             type=sha,prefix={{branch}}.
             type=ref,event=branch
