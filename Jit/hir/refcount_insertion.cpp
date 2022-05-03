@@ -1228,7 +1228,7 @@ void RefcountInsertion::Run(Function& func) {
   TRACE(
       "Starting refcount insertion for '%s':\n%s",
       func.fullname,
-      HIRPrinter(true).ToString(func));
+      HIRPrinter(PrinterFlags::kShowSnapshots).ToString(func));
   Env env{func};
 
   auto rpo_blocks = func.cfg.GetRPOTraversal();

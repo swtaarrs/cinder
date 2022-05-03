@@ -32,7 +32,7 @@ class Printer {
     return getFunction(*opnd.instr());
   }
 
-  hir::HIRPrinter hir_printer_{false, "# "};
+  hir::HIRPrinter hir_printer_{hir::PrinterFlags::kNone, "# "};
 };
 
 class JSONPrinter {

@@ -273,6 +273,14 @@ void initFlagProcessor() {
 
     xarg_flag_processor
         .addOption(
+            "jit-dump-hir-line-numbers",
+            "PYTHONJITDUMPHIRLINENUMBERS",
+            g_dump_hir_line_numbers,
+            "TODO")
+        .withDebugMessageOverride("TODO");
+
+    xarg_flag_processor
+        .addOption(
             "jit-dump-hir-passes",
             "PYTHONJITDUMPHIRPASSES",
             g_dump_hir_passes,

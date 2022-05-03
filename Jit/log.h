@@ -27,6 +27,7 @@ extern int g_debug;
 extern int g_debug_refcount;
 extern int g_debug_verbose;
 extern int g_dump_hir;
+extern int g_dump_hir_line_numbers;
 extern int g_dump_hir_passes;
 extern const char* g_dump_hir_passes_json;
 extern int g_dump_final_hir;

@@ -12,6 +12,12 @@
 namespace jit {
 namespace hir {
 
+enum PrinterFlags {
+  kNone = 0,
+  kShowSnapshots = 0x1 << 0,
+  kShowLineNumbers = 0x1 << 1,
+};
+
 // Helper class for pretty printing IR
 //
 // TODO(mpage): This works, but feels horribly kludgy. This should be possible
@@ -19,9 +25,11 @@ namespace hir {
 class HIRPrinter {
  public:
   explicit HIRPrinter(
-      bool show_snapshots = false,
+      PrinterFlags flags = PrinterFlags::kNone,
       const std::string line_prefix = "")
-      : show_snapshots_(show_snapshots), line_prefix_(line_prefix) {}
+      : show_snapshots_(flags & PrinterFlags::kShowSnapshots),
+        show_line_numbers_(flags & PrinterFlags::kShowLineNumbers),
+        line_prefix_(line_prefix) {}
 
   void Print(std::ostream& os, const Function& func);
   void Print(std::ostream& os, const CFG& cfg);
@@ -43,12 +51,14 @@ class HIRPrinter {
   }
 
  private:
+  void PrintLineNumber(std::ostream& os, int line, const char* filename);
   void Indent();
   void Dedent();
   std::ostream& Indented(std::ostream& os);
 
   int indent_level_{0};
   bool show_snapshots_{false};
+  bool show_line_numbers_{false};
   std::string line_prefix_;
 };
 
@@ -67,28 +77,36 @@ class JSONPrinter {
   nlohmann::json Print(const Instr& instr);
 };
 
+inline PrinterFlags getFlags() {
+  PrinterFlags result = PrinterFlags::kNone;
+  if (g_dump_hir_line_numbers) {
+    result = static_cast<PrinterFlags>(result | PrinterFlags::kShowLineNumbers);
+  }
+  return result;
+}
+
 inline std::ostream& operator<<(std::ostream& os, const Function& func) {
-  HIRPrinter().Print(os, func);
+  HIRPrinter(getFlags()).Print(os, func);
   return os;
 }
 
 inline std::ostream& operator<<(std::ostream& os, const CFG& cfg) {
-  HIRPrinter().Print(os, cfg);
+  HIRPrinter(getFlags()).Print(os, cfg);
   return os;
 }
 
 inline std::ostream& operator<<(std::ostream& os, const BasicBlock& block) {
-  HIRPrinter().Print(os, block);
+  HIRPrinter(getFlags()).Print(os, block);
   return os;
 }
 
 inline std::ostream& operator<<(std::ostream& os, const Instr& instr) {
-  HIRPrinter().Print(os, instr);
+  HIRPrinter(getFlags()).Print(os, instr);
   return os;
 }
 
 inline std::ostream& operator<<(std::ostream& os, const FrameState& state) {
-  HIRPrinter().Print(os, state);
+  HIRPrinter(getFlags()).Print(os, state);
   return os;
 }
 

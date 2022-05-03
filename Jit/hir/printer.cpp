@@ -34,7 +34,19 @@ void HIRPrinter::Dedent() {
   indent_level_ -= 1;
 }
 
+void HIRPrinter::PrintLineNumber(
+    std::ostream& os,
+    int line,
+    const char* filename) {
+  if (!show_line_numbers_) {
+    return;
+  }
+  fmt::print(os, "#line {} \"{}\":\n", line, filename);
+}
+
 void HIRPrinter::Print(std::ostream& os, const Function& func) {
+  PrintLineNumber(
+      os, func.code->co_firstlineno, PyUnicode_AsUTF8(func.code->co_filename));
   fmt::print(
       os, "fun {} {{\n", func.fullname.empty() ? "<unknown>" : func.fullname);
   Indent();
@@ -78,6 +90,13 @@ void HIRPrinter::Print(std::ostream& os, const BasicBlock& block) {
   os << " {\n";
   Indent();
   for (auto& instr : block) {
+    const FrameState* fs = get_frame_state(instr);
+    if (fs != nullptr) {
+      PrintLineNumber(
+          os,
+          PyCode_Addr2Line(fs->code, instr.bytecodeOffset()),
+          PyUnicode_AsUTF8(fs->code->co_filename));
+    }
     if (instr.IsSnapshot() && !show_snapshots_) {
       continue;
     }
@@ -1051,15 +1070,15 @@ void JSONPrinter::Print(
 }
 
 void DebugPrint(const CFG& cfg) {
-  HIRPrinter(true).Print(std::cout, cfg);
+  HIRPrinter(PrinterFlags::kShowSnapshots).Print(std::cout, cfg);
 }
 
 void DebugPrint(const BasicBlock& block) {
-  HIRPrinter(true).Print(std::cout, block);
+  HIRPrinter(PrinterFlags::kShowSnapshots).Print(std::cout, block);
 }
 
 void DebugPrint(const Instr& instr) {
-  HIRPrinter(true).Print(std::cout, instr);
+  HIRPrinter(PrinterFlags::kShowSnapshots).Print(std::cout, instr);
 }
 
 } // namespace hir

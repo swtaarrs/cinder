@@ -9,6 +9,7 @@ int g_debug = 0;
 int g_debug_refcount = 0;
 int g_debug_verbose = 0;
 int g_dump_hir = 0;
+int g_dump_hir_line_numbers = 0;
 int g_dump_hir_passes = 0;
 const char* g_dump_hir_passes_json = nullptr;
 int g_dump_final_hir = 0;
