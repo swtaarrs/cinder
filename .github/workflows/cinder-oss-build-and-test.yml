@@ -43,13 +43,14 @@ jobs:
       - name: Run Cinder Tests
         run: docker run --rm -w /cinder/build ${{ steps.buildmeta.outputs.tags }} ./oss-cinder-test.sh
       - name: Extract metadata for tested Cinder Docker image push
-        id: pushmeta
+        id: runtimemeta
         uses: docker/metadata-action@v3
         with:
           images: ${{ env.CINDER_RUNTIME_IMAGE_NAME }}
-          # once the image passes tests, we also publish it using the branch name (e.g. "cinder-3.8")
+          # once the tests pass, we publish the runtime image using the sha and branch name (e.g. "cinder-3.8")
           # if this is the default branch, we also publish the image as "latest"
           tags: |
+            type=sha,prefix={{branch}}.
             type=ref,event=branch
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
       - name: Publish new version of latest Cinder Docker images
@@ -57,8 +58,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.pushmeta.outputs.tags }}
-          labels: ${{ steps.pushmeta.outputs.labels }}
+          tags: ${{ steps.runtimemeta.outputs.tags }}
+          labels: ${{ steps.runtimemeta.outputs.labels }}
           # the build should be efficient, reusing the build image layers from a previous step
           target: runtime
           file: .github/workflows/cinder/Dockerfile
